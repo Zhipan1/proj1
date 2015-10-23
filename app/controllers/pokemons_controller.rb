@@ -12,12 +12,24 @@ class PokemonsController < ApplicationController
     pokemon.health -= 10
 
     if pokemon.health <= 0
-      pokemon.destroy
-      flash[:notice] = "Damn you roasted this dude. #{pokemon.name} is dead AF."
-    else
-      pokemon.save
+      attacker = Pokemon.find(params[:attacker])
+      attacker.level += 1
+      attacker.save
+      flash[:notice] = "Damn you roasted this dude. #{pokemon.name} fainted. #{attacker.name} leveled up to level #{attacker.level}"
     end
 
+    pokemon.save
+    redirect_to :back
+  end
+
+  def heal
+    pokemon = Pokemon.find(params[:id])
+    pokemon.health += 10
+    if pokemon.health >= 100
+      pokemon.health = 100
+      flash[:notice] = "#{pokemon.name} is at full health! :)"
+    end
+    pokemon.save
     redirect_to :back
   end
 

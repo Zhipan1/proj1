@@ -3,18 +3,29 @@
 <p>Email: <%= @trainer.email if @trainer.email %></p>
 <% if not @trainer.pokemons.empty? %>
   <h4>Pokemons</h4>
-    <% @trainer.pokemons.each do |p| %>
+    <% @trainer.pokemons.where("health > 0").each do |p| %>
         <p>
           <%= p.name %>- level: <%= p.level %>, health: <%= p.health %>
-          <% if p.health <= 10 %>
-            <%= button_to "End this dude's career", damage_path(id: p), method: :patch, class: "button small" %>
+          <% if @current_trainer %>
+            <% if p.health <= 10 %>
+              <%= button_to "OMG heal this pokemon. It finna die.", heal_path(id: p), method: :patch, class: "button small" %>
+            <% else %>
+              <%= button_to 'Heal!', heal_path(id: p), method: :patch, class: "button small" %>
+            <% end %>
           <% else %>
-            <%= button_to 'Damage!', damage_path(id: p), method: :patch, class: "button small" %>
+            <%= form_tag damage_path(id: p), method: :patch do %>
+              <%= select_tag :attacker, options_from_collection_for_select(current_trainer.pokemons, "id", "name") %>
+              <% if p.health <= 10 %>
+                <%= submit_tag "End this dude's career", class: "button small" %>
+              <% else %>
+                <%= submit_tag 'Damage!', class: "button small" %>
+              <% end %>
+            <% end %>
           <% end %>
         </p>
     <% end %>
 <% end %>
 
-<% if @logged_in %>
+<% if @current_trainer %>
   <%= button_to "Create Pokemon!", new_pokemon_path, method: :get, class: "button medium" %>
 <% end %>

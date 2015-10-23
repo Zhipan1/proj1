@@ -7,7 +7,7 @@ class TrainersController < ApplicationController
 
   def show
     @trainer = Trainer.find(params[:id])
-    @logged_in = @trainer == current_trainer
+    @current_trainer = @trainer == current_trainer
   end
 
 end
