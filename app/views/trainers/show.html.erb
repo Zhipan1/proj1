@@ -3,16 +3,17 @@
 <p>Email: <%= @trainer.email if @trainer.email %></p>
 <% if not @trainer.pokemons.empty? %>
   <h4>Pokemons</h4>
+    <p style="color: red"><%= "You have no pokemons to attack with!" if current_trainer.pokemons.empty? %> </p>
     <% @trainer.pokemons.where("health > 0").each do |p| %>
         <p>
           <%= p.name %>- level: <%= p.level %>, health: <%= p.health %>
-          <% if @current_trainer %>
+          <% if @trainer == @current_trainer %>
             <% if p.health <= 10 %>
               <%= button_to "OMG heal this pokemon. It finna die.", heal_path(id: p), method: :patch, class: "button small" %>
             <% else %>
               <%= button_to 'Heal!', heal_path(id: p), method: :patch, class: "button small" %>
             <% end %>
-          <% else %>
+          <% elsif not current_trainer.pokemons.empty? %>
             <%= form_tag damage_path(id: p), method: :patch do %>
               <%= select_tag :attacker, options_from_collection_for_select(current_trainer.pokemons, "id", "name") %>
               <% if p.health <= 10 %>
@@ -26,6 +27,6 @@
     <% end %>
 <% end %>
 
-<% if @current_trainer %>
+<% if @trainer == @current_trainer %>
   <%= button_to "Create Pokemon!", new_pokemon_path, method: :get, class: "button medium" %>
 <% end %>
